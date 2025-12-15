@@ -49,3 +49,6 @@ def get_next_id(data: List[Dict[str, Any]]) -> int:
     if not data:
         return 1
     return max(int(item.get('id', 0)) for item in data) + 1
+
+# Alias for compatibility
+load_json_file = read_json_file
