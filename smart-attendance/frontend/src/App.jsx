@@ -4,7 +4,7 @@ import Login from './components/Login'
 import Dashboard from './components/Dashboard'
 import AdminPanel from './components/AdminPanel'
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000'
+const API_BASE_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:8000`
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)

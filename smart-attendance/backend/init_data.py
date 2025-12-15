@@ -6,43 +6,43 @@ from utils import hash_password
 def initialize_data():
     os.makedirs(os.path.dirname(USERS_FILE), exist_ok=True)
     
-    if not os.path.exists(USERS_FILE):
-        users = [
-            {
-                "id": 1,
-                "name": "Admin User",
-                "email": "admin@example.com",
-                "password": hash_password("password"),
-                "role": "admin",
-                "department": "Management"
-            },
-            {
-                "id": 2,
-                "name": "John Doe",
-                "email": "emp@example.com",
-                "password": hash_password("password"),
-                "role": "employee",
-                "department": "Engineering"
-            },
-            {
-                "id": 3,
-                "name": "Jane Smith",
-                "email": "jane@example.com",
-                "password": hash_password("password"),
-                "role": "employee",
-                "department": "HR"
-            }
-        ]
-        with open(USERS_FILE, 'w') as f:
-            json.dump(users, f, indent=2)
+    users = [
+        {
+            "id": 1,
+            "name": "Admin User",
+            "email": "admin@example.com",
+            "password": hash_password("password"),
+            "role": "admin",
+            "department": "Management"
+        },
+        {
+            "id": 2,
+            "name": "John Doe",
+            "email": "emp@example.com",
+            "password": hash_password("password"),
+            "role": "employee",
+            "department": "Engineering"
+        },
+        {
+            "id": 3,
+            "name": "Jane Smith",
+            "email": "jane@example.com",
+            "password": hash_password("password"),
+            "role": "employee",
+            "department": "HR"
+        }
+    ]
+    with open(USERS_FILE, 'w') as f:
+        json.dump(users, f, indent=2)
+    print(f"Users initialized: {len(users)} users created")
     
-    if not os.path.exists(ATTENDANCE_FILE):
-        with open(ATTENDANCE_FILE, 'w') as f:
-            json.dump([], f, indent=2)
+    with open(ATTENDANCE_FILE, 'w') as f:
+        json.dump([], f, indent=2)
+    print("Attendance file initialized")
     
-    if not os.path.exists(LEAVES_FILE):
-        with open(LEAVES_FILE, 'w') as f:
-            json.dump([], f, indent=2)
+    with open(LEAVES_FILE, 'w') as f:
+        json.dump([], f, indent=2)
+    print("Leaves file initialized")
 
 if __name__ == "__main__":
     initialize_data()
