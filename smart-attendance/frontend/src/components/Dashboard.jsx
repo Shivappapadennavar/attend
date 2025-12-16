@@ -5,6 +5,7 @@ function Dashboard({ user, apiBaseUrl }) {
   const [activeTab, setActiveTab] = useState('attendance')
   const [attendanceData, setAttendanceData] = useState(null)
   const [leaveRequests, setLeaveRequests] = useState([])
+  const [attendanceHistory, setAttendanceHistory] = useState([])
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [leaveForm, setLeaveForm] = useState({
@@ -17,6 +18,7 @@ function Dashboard({ user, apiBaseUrl }) {
   useEffect(() => {
     fetchAttendanceData()
     fetchLeaveRequests()
+    fetchAttendanceHistory()
   }, [])
 
   const fetchAttendanceData = async () => {
@@ -43,6 +45,19 @@ function Dashboard({ user, apiBaseUrl }) {
     }
   }
 
+  const fetchAttendanceHistory = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.get(`${apiBaseUrl}/api/attendance/all`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const userHistory = response.data.filter(record => record.user_id === user.id)
+      setAttendanceHistory(userHistory)
+    } catch (err) {
+      console.error('Error fetching attendance history:', err)
+    }
+  }
+
   const handleCheckIn = async () => {
     setLoading(true)
     setMessage('')
@@ -55,6 +70,7 @@ function Dashboard({ user, apiBaseUrl }) {
       )
       setMessage({ type: 'success', text: 'Checked in successfully!' })
       fetchAttendanceData()
+      fetchAttendanceHistory()
     } catch (err) {
       setMessage({ type: 'error', text: err.response?.data?.detail || 'Check-in failed' })
     } finally {
@@ -74,6 +90,7 @@ function Dashboard({ user, apiBaseUrl }) {
       )
       setMessage({ type: 'success', text: 'Checked out successfully!' })
       fetchAttendanceData()
+      fetchAttendanceHistory()
     } catch (err) {
       setMessage({ type: 'error', text: err.response?.data?.detail || 'Check-out failed' })
     } finally {
@@ -237,7 +254,9 @@ function Dashboard({ user, apiBaseUrl }) {
                   <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200 hover:shadow-md transition-shadow">
                     <div>
                       <p className="text-sm font-medium text-green-700">Present Days</p>
-                      <p className="text-3xl font-bold text-green-900 mt-1">0</p>
+                      <p className="text-3xl font-bold text-green-900 mt-1">
+                        {attendanceHistory.filter(record => record.check_in && record.check_out).length}
+                      </p>
                     </div>
                     <svg className="w-12 h-12 text-green-300" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -246,7 +265,9 @@ function Dashboard({ user, apiBaseUrl }) {
                   <div className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-lg border border-red-200 hover:shadow-md transition-shadow">
                     <div>
                       <p className="text-sm font-medium text-red-700">Absent Days</p>
-                      <p className="text-3xl font-bold text-red-900 mt-1">0</p>
+                      <p className="text-3xl font-bold text-red-900 mt-1">
+                        {attendanceHistory.filter(record => !record.check_in).length}
+                      </p>
                     </div>
                     <svg className="w-12 h-12 text-red-300" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />

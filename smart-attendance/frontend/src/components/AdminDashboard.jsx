@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import AdvancedDashboard from './AdvancedDashboard'
 import AdminPanel from './AdminPanel'
+import UserManagement from './UserManagement'
 
 function AdminDashboard({ user, apiBaseUrl }) {
   const [activeSection, setActiveSection] = useState('management')
@@ -27,6 +28,21 @@ function AdminDashboard({ user, apiBaseUrl }) {
               </span>
             </button>
             <button
+              onClick={() => setActiveSection('users')}
+              className={`pb-4 px-4 font-semibold text-lg transition-all duration-300 border-b-4 -mb-2 whitespace-nowrap ${
+                activeSection === 'users'
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                User Management
+              </span>
+            </button>
+            <button
               onClick={() => setActiveSection('analytics')}
               className={`pb-4 px-4 font-semibold text-lg transition-all duration-300 border-b-4 -mb-2 whitespace-nowrap ${
                 activeSection === 'analytics'
@@ -48,6 +64,8 @@ function AdminDashboard({ user, apiBaseUrl }) {
       {/* Content */}
       {activeSection === 'management' ? (
         <AdminPanel user={user} apiBaseUrl={apiBaseUrl} />
+      ) : activeSection === 'users' ? (
+        <UserManagement user={user} apiBaseUrl={apiBaseUrl} />
       ) : (
         <AdvancedDashboard user={user} apiBaseUrl={apiBaseUrl} />
       )}
