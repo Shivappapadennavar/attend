@@ -2,12 +2,16 @@
 
 set -e
 
+# Get branch name from input or use default
+BRANCH_NAME="${1:-main}"
 REPO_URL="https://github.com/bot28-b/attend.git"
 DEPLOY_DIR="/home/ubuntu/smart-attendance"
 PROJECT_DIR="$DEPLOY_DIR/smart-attendance"
 
 echo "=========================================="
 echo "Smart Attendance System - Auto Deployment"
+echo "=========================================="
+echo "Branch: $BRANCH_NAME"
 echo "=========================================="
 echo ""
 
@@ -24,16 +28,25 @@ else
 fi
 echo ""
 
-# Step 2: Clone repository
-echo "[2/8] Cloning repository..."
+# Step 2: Clone repository and checkout branch
+echo "[2/8] Cloning repository from branch: $BRANCH_NAME..."
 if [ -d "$DEPLOY_DIR" ]; then
     echo "Removing existing deployment directory..."
     rm -rf "$DEPLOY_DIR"
 fi
 mkdir -p "$DEPLOY_DIR"
 cd "$DEPLOY_DIR"
-git clone "$REPO_URL" .
-echo "✓ Repository cloned successfully"
+git clone -b "$BRANCH_NAME" "$REPO_URL" .
+if [ $? -ne 0 ]; then
+    echo "✗ Failed to clone branch '$BRANCH_NAME'. Checking available branches..."
+    git clone "$REPO_URL" .
+    cd "$DEPLOY_DIR"
+    echo "Available branches:"
+    git branch -r
+    echo "Please specify a valid branch name."
+    exit 1
+fi
+echo "✓ Repository cloned successfully from branch: $BRANCH_NAME"
 echo ""
 
 # Step 3: Stop existing containers
@@ -94,6 +107,12 @@ echo "=========================================="
 echo "Deployment Complete!"
 echo "=========================================="
 echo ""
+echo "Deployment Details:"
+echo "  Branch:       $BRANCH_NAME"
+echo "  Repository:   $REPO_URL"
+echo "  Deploy Dir:   $DEPLOY_DIR"
+echo "  Project Dir:  $PROJECT_DIR"
+echo ""
 echo "Running Containers:"
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 echo ""
@@ -113,4 +132,9 @@ echo "  Restart:       docker restart smart-attendance-backend smart-attendance-
 echo "  Stop:          docker stop smart-attendance-backend smart-attendance-frontend"
 echo ""
 echo "Data Location: $PROJECT_DIR/backend/data"
+echo ""
+echo "To redeploy with a different branch:"
+echo "  ./deploy.sh develop/1.0"
+echo "  ./deploy.sh main"
+echo "  ./deploy.sh <branch-name>"
 echo ""

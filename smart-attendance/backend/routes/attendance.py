@@ -85,6 +85,23 @@ async def check_out(request: AttendanceRequest, current_user: dict = Depends(get
     write_json_file(ATTENDANCE_FILE, attendance_records)
     return {"message": "Checked out successfully"}
 
+@router.get("/all")
+async def get_all_attendance(current_user: dict = Depends(get_current_user)):
+    from config import USERS_FILE
+    attendance_records = read_json_file(ATTENDANCE_FILE)
+    users = read_json_file(USERS_FILE)
+    
+    user_map = {u['id']: u['name'] for u in users}
+    
+    result = []
+    for record in attendance_records:
+        result.append({
+            **record,
+            "user_name": user_map.get(record['user_id'], 'Unknown')
+        })
+    
+    return result
+
 @router.get("/{user_id}")
 async def get_today_attendance(user_id: int, current_user: dict = Depends(get_current_user)):
     attendance_records = read_json_file(ATTENDANCE_FILE)
@@ -105,20 +122,3 @@ async def get_today_attendance(user_id: int, current_user: dict = Depends(get_cu
         }
     
     return record
-
-@router.get("/all")
-async def get_all_attendance(current_user: dict = Depends(get_current_user)):
-    from config import USERS_FILE
-    attendance_records = read_json_file(ATTENDANCE_FILE)
-    users = read_json_file(USERS_FILE)
-    
-    user_map = {u['id']: u['name'] for u in users}
-    
-    result = []
-    for record in attendance_records:
-        result.append({
-            **record,
-            "user_name": user_map.get(record['user_id'], 'Unknown')
-        })
-    
-    return result
